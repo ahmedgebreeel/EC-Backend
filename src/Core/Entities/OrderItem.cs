@@ -28,7 +28,7 @@ public class OrderItem
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal Price { get; set; } // Price at time of order
+    public decimal Price { get; set; } // Unit Price of the product at time of order
 
     // Timestamps
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
