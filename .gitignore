@@ -58,8 +58,8 @@ wwwroot/uploads/
 
 # Environment variables / secrets
 .env
-appsettings.json
-appsettings.*.json
+appsettings.Development.json
+appsettings.Local.json
 secrets.json
 
 # Docker
