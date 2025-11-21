@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
@@ -34,6 +35,11 @@ namespace Data.Repositories
         public void Delete(T entity)
         {
             context.Set<T>().Remove(entity);
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await context.Set<T>().Where(predicate).ToListAsync();
         }
     }
 }

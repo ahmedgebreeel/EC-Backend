@@ -35,7 +35,8 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
             // Index for faster queries
-            entity.HasIndex(c => c.Name);
+            entity.HasIndex(c => c.Name)
+                .IsUnique();
         });
 
         // ============================================
