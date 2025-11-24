@@ -14,80 +14,66 @@ namespace Business.Services
             _unitOfWork = unitOfWork;
         }
 
-        // Get all carts (with DTO)
-        public async Task<List<ShoppingCartDTO>> GetAllCartsAsync()
+        public async Task<IEnumerable<ShoppingCartDto>> GetAllCartsAsync()
         {
-            // Placeholder for future logic
             var carts = await _unitOfWork.Repository<ShoppingCart>().GetAllAsync();
-
-            // Map entities to DTOs (just basic props, extend later)
-            return carts.Select(c => new ShoppingCartDTO
+            var shoppingCarts = carts.Select(c => new ShoppingCartDto
             {
                 Id = c.Id,
                 UserId = c.UserId,
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt,
-                CartItems = new List<CartItemDTO>() // Load as needed later
-            }).ToList();
+                CartItems = new List<CartItemDto>() // Populate cart items as needed
+            });
+
+            return shoppingCarts;
         }
 
-        // Get cart by Id (with DTO)
-        public async Task<ShoppingCartDTO?> GetCartByIdAsync(string cartId)
+        public async Task<ShoppingCartDto> GetCartByIdAsync(string id)
         {
-            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(cartId);
-            if (cart == null) return null;
-            // Need to check on user once auth is in place
-            // Load CartItems and Map to DTOs later as needed
-            return new ShoppingCartDTO
+            var Shoppingcart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(id);
+            if (Shoppingcart == null) return null;
+
+            // Load CartItems here if needed
+
+            return new ShoppingCartDto
             {
-                Id = cart.Id,
-                UserId = cart.UserId,
-                CreatedAt = cart.CreatedAt,
-                UpdatedAt = cart.UpdatedAt,
-                CartItems = new List<CartItemDTO>() // populate later
+                Id = Shoppingcart.Id,
+                UserId = Shoppingcart.UserId,
+                CreatedAt = Shoppingcart.CreatedAt,
+                UpdatedAt = Shoppingcart.UpdatedAt,
+                CartItems = new List<CartItemDto>() // Populate cart items as needed
             };
         }
 
-        // Add new cart with DTO
-        public async Task<ShoppingCartDTO> AddCartAsync(ShoppingCartDTO cartDTO)
+        public async Task<ShoppingCartDto> AddCartAsync(ShoppingCartDto ShoppingcartDto)
         {
+            if (ShoppingcartDto == null)
+                throw new ArgumentNullException(nameof(ShoppingcartDto));
+
             var cart = new ShoppingCart
             {
-                UserId = cartDTO.UserId,
+                UserId = ShoppingcartDto.UserId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
-                // Id will be auto-generated
             };
 
             await _unitOfWork.Repository<ShoppingCart>().AddAsync(cart);
             await _unitOfWork.SaveChangesAsync();
 
-            cartDTO.Id = cart.Id;
-            cartDTO.CreatedAt = cart.CreatedAt;
-            cartDTO.UpdatedAt = cart.UpdatedAt;
-            cartDTO.CartItems = new List<CartItemDTO>();
+            ShoppingcartDto.Id = cart.Id;
+            ShoppingcartDto.CreatedAt = cart.CreatedAt;
+            ShoppingcartDto.UpdatedAt = cart.UpdatedAt;
+            ShoppingcartDto.CartItems = new List<CartItemDto>();
 
-            return cartDTO;
+            return ShoppingcartDto;
         }
 
-        // Update cart (e.g., update timestamps or userId)
-        public async Task UpdateCartAsync(ShoppingCartDTO cartDTO)
+        public async Task DeleteCartAsync(string id)
         {
-            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(cartDTO.Id);
-            if (cart == null) throw new ArgumentException("Cart not found");
-
-            cart.UserId = cartDTO.UserId;
-            cart.UpdatedAt = DateTime.UtcNow;
-
-            _unitOfWork.Repository<ShoppingCart>().Update(cart);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        // Remove cart by Id
-        public async Task DeleteCartAsync(string cartId)
-        {
-            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(cartId);
-            if (cart == null) return;
+            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(id);
+            if (cart == null)
+                throw new KeyNotFoundException("Shopping cart not found");
 
             _unitOfWork.Repository<ShoppingCart>().Delete(cart);
             await _unitOfWork.SaveChangesAsync();

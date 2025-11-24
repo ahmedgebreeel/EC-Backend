@@ -10,6 +10,9 @@ out/
 *.a
 *.lib
 
+# Visual Studio cache
+.vs/
+
 # VS Code specific
 .vscode/
 .history/
