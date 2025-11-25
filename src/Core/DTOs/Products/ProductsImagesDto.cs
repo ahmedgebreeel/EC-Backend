@@ -9,7 +9,7 @@ namespace Core.DTOs.Products
 {
     public class ProductsImagesDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; }
 
         public string ImageUrl { get; set; }
 
@@ -20,8 +20,6 @@ namespace Core.DTOs.Products
 
     public class CreateProductsImagesDto
     {
-        
-        public string Id { get; set; } = Guid.NewGuid().ToString();
         [Required]
         [MaxLength(1000)]
         public string ImageUrl { get; set; }

@@ -8,7 +8,7 @@ namespace Core.DTOs.Products
 {
     public class ProductDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string CategoryName { get; set; }
@@ -20,8 +20,7 @@ namespace Core.DTOs.Products
 
     public class ProductDetailsDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string SellerName { get; set; }

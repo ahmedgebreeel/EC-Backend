@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.DTOs.Products;
 using Core.Entities;
+using Core.Enums;
 using Data.Repositories;
 using System;
 using System.Collections.Generic;
@@ -12,160 +13,100 @@ namespace Business.Services
 {
     public class ProductService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly UnitOfWork unitOfWork;
         private readonly IMapper _mapper;
 
-        public ProductService(UnitOfWork unitOfWork, IMapper mapper)
+        public ProductService(UnitOfWork _unitOfWork, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            unitOfWork = _unitOfWork;
             _mapper = mapper;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
-            var products = await _unitOfWork
+            var products = await unitOfWork
                 .Products
                 .GetAllAsync();
-            if (products == null) throw new KeyNotFoundException("Product not found");
-
 
             return _mapper.Map<List<ProductDto>>(products);
                 
         }
 
 
-        public async Task<ProductDetailsDto?> GetProductAsync(string id)
+        public async Task<ProductDetailsDto?> GetByIdAsync(string id)
         {
-            var product =  await _unitOfWork
+            var product =  await unitOfWork
                .Products
                .GetByIdAsync(id);
-            if (product == null) throw new KeyNotFoundException("Product not found");
+
+            if (product == null) return null;
 
             return _mapper.Map<ProductDetailsDto?>(product);
         }
 
-       public async Task CreateProductAsync(CreateProductDto product)
+       public async Task AddAsync(CreateProductDto product)
         {
             //check if category is exist
-            var category = await _unitOfWork.GenericRepository<Category>()
+            var category = await unitOfWork.Repository<Category>()
                 .GetByIdAsync(product.CategoryId);
             if (category == null)
                 throw new KeyNotFoundException("Category not found.");
 
-                var seller = await _unitOfWork.GenericRepository<User>()
-                .GetByIdAsync(product.SellerId);
-            //Todo: make sure its role is a seller
+            var seller = await unitOfWork.Users.GetByIdAsync(product.SellerId);
             if (seller == null) throw new KeyNotFoundException("Seller not found");
 
+            //make sure its role is a seller
+            if(seller.Role.Name != RoleType.Seller.ToString()) throw new InvalidOperationException("User is not a seller");
 
-
-            await _unitOfWork.Products
+            //ToDo: saving the images !!
+            await unitOfWork.Products
                 .AddAsync(_mapper.Map<Product>(product));
+
+            await unitOfWork.SaveChangesAsync();    
         }
 
-        public async Task UpdateProductAsync (UpdateProductDto product)
+        public async Task UpdateAsync (string id, UpdateProductDto updateProductDto)
         {
-            var exist = await _unitOfWork
-                .GenericRepository<Product>()
-                .GetByIdAsync(product.Id);
+            var product = await unitOfWork
+                .Repository<Product>()
+                .GetByIdAsync(id);
 
-            if (exist == null) throw new KeyNotFoundException("Product not found");
+            if (product == null) throw new KeyNotFoundException("Product not found");
 
-            var category = await _unitOfWork.GenericRepository<Category>()
-                .GetByIdAsync(product.CategoryId);
+            var category = await unitOfWork.Repository<Category>()
+                .GetByIdAsync(updateProductDto.CategoryId);
             if (category == null)
                 throw new KeyNotFoundException("Category not found.");
 
-            var seller = await _unitOfWork.GenericRepository<User>()
-                .GetByIdAsync(product.SellerId);
+            var seller = await unitOfWork.Repository<User>()
+                .GetByIdAsync(updateProductDto.SellerId);
             if (seller == null) throw new KeyNotFoundException("Seller not found");
-
-            if(product.Stock == 0)
-                throw new InvalidOperationException("Cannot update a product with stock equal to zero.");
-
-
             
-            exist.Name = product.Name;
-            exist.Description = product.Description;
-            exist.Price = product.Price;
-            exist.Stock = product.Stock;
-            exist.SellerId = product.SellerId;
-            exist.CategoryId = product.CategoryId;
+            product.Name = updateProductDto.Name;
+            product.Description = updateProductDto.Description;
+            product.Price = updateProductDto.Price;
+            product.Stock = updateProductDto.Stock;
+            product.SellerId = updateProductDto.SellerId;
+            product.CategoryId = updateProductDto.CategoryId;
 
-            var existingImages = exist.Images.ToList();
+            //ToDo: Updating the images !!
 
-            // DTO image IDs
-            var dtoImageIds = product.Images
-                .Where(i => !string.IsNullOrEmpty(i.Id))
-                .Select(i => i.Id)
-                .ToList();
+            unitOfWork.Products.Update(product);
 
-            // (A) DELETE IMAGES removed from DTO
-            var imagesToDelete = existingImages
-                .Where(img => !dtoImageIds.Contains(img.Id))
-                .ToList();
-
-            foreach (var img in imagesToDelete)
-            {
-                exist.Images.Remove(img);
-                await _unitOfWork.GenericRepository<ProductImage>().DeleteAsync(img);
-            }
-
-            // (B) UPDATE existing images
-            foreach (var dtoImg in product.Images
-                .Where(i => !string.IsNullOrEmpty(i.Id)))
-            {
-                var existingImg = existingImages.FirstOrDefault(e => e.Id == dtoImg.Id);
-                if (existingImg != null)
-                {
-                    existingImg.ImageUrl = dtoImg.ImageUrl;
-                    existingImg.Position = dtoImg.Position;
-                }
-            }
-
-            // (C) ADD new images (with no ID)
-            var newImages = product.Images
-                .Where(i => string.IsNullOrEmpty(i.Id))
-                .Select(i => new ProductImage
-                {
-                    ImageUrl = i.ImageUrl,
-                    Position = i.Position,
-                    ProductId = exist.Id
-                }).ToList();
-
-            foreach (var img in newImages)
-            {
-                await _unitOfWork.GenericRepository<ProductImage>().AddAsync(img);
-                exist.Images.Add(img);
-            }
-
-
-
-            await _unitOfWork
-                .Products
-                .EditAsync(exist);
-
-
+            await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteProductAsync(UpdateProductDto product)
+        public async Task DeleteAsync(string id)
         {
-            var exist = await _unitOfWork
-                .GenericRepository<Product>()
-                .GetByIdAsync(product.Id);
-            if (exist == null) throw new KeyNotFoundException("Product not found");
+            var product = await unitOfWork
+                .Repository<Product>()
+                .GetByIdAsync(id);
 
-            await _unitOfWork
-                .Products
-                .DeleteAsync(exist);
+            if (product == null) throw new KeyNotFoundException("Product not found");
+
+            unitOfWork.Products.Delete(product);
+            await unitOfWork.SaveChangesAsync();
         }
-
-
-     
-
-
-
-
 
     }
 }

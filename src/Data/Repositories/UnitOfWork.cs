@@ -1,78 +1,58 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
     public class UnitOfWork 
     {
-        private readonly AppDbContext _context;
-        private readonly Dictionary<Type, object> _repositories;
-        private IDbContextTransaction? _transaction;
+        private readonly AppDbContext context;
+        private readonly Dictionary<Type, object> repositories = new();
 
-        public ProductRepo Products { get; private set; }
+        private ProductRepo products ;
+        private UserRepository users;
 
-        public UnitOfWork(AppDbContext context)
+        public UnitOfWork(AppDbContext _context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _repositories = new Dictionary<Type, object>();
-            Products = new ProductRepo(_context);
+            context = _context;
 
         }
 
-        public GenericRepository<T> GenericRepository<T>() where T : class
+        public GenericRepository<T> Repository<T>() where T : class
         {
-            var type = typeof(T);
-
-            if (!_repositories.ContainsKey(type))
+            if(!repositories.ContainsKey(typeof(T)))
             {
-                var repositoryInstance = new GenericRepository<T>(_context);
-                _repositories.Add(type, repositoryInstance);
+                var repositoryInstance = new GenericRepository<T>(context);
+                repositories.Add(typeof(T), repositoryInstance);
             }
-
-            return (GenericRepository<T>)_repositories[type];
+            return (GenericRepository<T>)repositories[typeof(T)];
         }
 
-
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-        }
-
-        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            if (_transaction != null)
+        public ProductRepo Products {
+            get
             {
-                await _transaction.CommitAsync(cancellationToken);
-                await _transaction.DisposeAsync();
-                _transaction = null;
+                if (products == null)
+                {
+                    products = new ProductRepo(context);
+                }
+                return products;
             }
         }
 
-        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            if (_transaction != null)
+        public UserRepository Users {
+            get
             {
-                await _transaction.RollbackAsync(cancellationToken);
-                await _transaction.DisposeAsync();
-                _transaction = null;
+                if (users == null)
+                {
+                    users = new UserRepository(context);
+                }
+                return users;
             }
         }
-        public void Dispose()
-        {
-            _transaction?.Dispose();
-            _context?.Dispose();
-        }
+ 
 
-        
+        public async Task<int> SaveChangesAsync()
+        {
+            return await context.SaveChangesAsync();
+        } 
     }
 }

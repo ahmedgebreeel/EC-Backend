@@ -1,10 +1,5 @@
 ﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
@@ -16,9 +11,9 @@ namespace Data.Repositories
            
         }
 
-        public override async Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken = default)
+        public override async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return await _context.Products
+            return await context.Products
                 .Include(p=>p.Category)
                 .Include(p=>p.Images)
                 .Select(p=> new Product
@@ -43,19 +38,18 @@ namespace Data.Repositories
                     .ToList()
 
                 })
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .ToListAsync();
                 
                 
         }
 
-        public override async Task<Product?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+        public override async Task<Product?> GetByIdAsync(string id)
         {
-            return await _context.Products
+            return await context.Products
                 .Include(p=>p.Category)
                 .Include(p=>p.Seller)
                 .Include(p=>p.Images)
-                .FirstOrDefaultAsync(p=>p.Id == id, cancellationToken);
+                .FirstOrDefaultAsync(p=>p.Id == id);
                
         }
     }

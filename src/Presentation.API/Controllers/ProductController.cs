@@ -1,7 +1,5 @@
 ﻿using Business.Services;
 using Core.DTOs.Products;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.API.Controllers
@@ -10,84 +8,102 @@ namespace Presentation.API.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly ProductService _productService;
-        public ProductController(ProductService productService) { 
-            _productService = productService;
+        private readonly ProductService productService;
+        public ProductController(ProductService _productService) { 
+            productService = _productService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index() {
+        public async Task<IActionResult> GetAllAsync() {
             try
             {
-                var produts = await _productService.GetAllAsync();
+                var produts = await productService.GetAllAsync();
                 return Ok(produts);
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound();
-            }
+                Console.WriteLine(ex);
+                return StatusCode(500, "Internal server error");
+            } 
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetByIdAsync(string id)
         {
             try
             {
-                var product = await _productService.GetProductAsync(id);
-                if (product == null) return NotFound();
+                var product = await productService.GetByIdAsync(id);
+                if (product == null)
+                {
+                  return NotFound("Product not found");  
+                } 
                 return Ok(product);
             }
-            catch
-            {
-                return BadRequest();
+            catch (Exception ex)
+            {   
+                Console.WriteLine(ex);
+                return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody]CreateProductDto productDto)
+        public async Task<IActionResult> AddAsync(CreateProductDto productDto)
         {
             if(!ModelState.IsValid) return BadRequest();
             try
             {
-                await _productService.CreateProductAsync(productDto);
+                await productService.AddAsync(productDto);
                 return Created();
             }
-            catch 
+            catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody]UpdateProductDto productDto)
+        public async Task<IActionResult> UpdateAsync(string id,UpdateProductDto productDto)
         {
-            try
-            {
-                var exist = await _productService.GetProductAsync(productDto.Id);
-                if (exist == null) return NotFound();
-                if (!ModelState.IsValid) return BadRequest();
-                await _productService.UpdateProductAsync(productDto);
-                return Ok(new { message = "Updated Successfully" });
-            }
-            catch
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
+            }
+            try
+            {
+                await productService.UpdateAsync(id, productDto);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
             }
 
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteAsync(string id)
         {
             try
             {
-                var exist = await _productService.GetProductAsync(id);
-                if (exist == null) return NotFound();
-                return Ok(new { message = "Deleted Successfully" });
+                await productService.DeleteAsync(id);
+                return NoContent();
             }
-            catch
+            catch (KeyNotFoundException ex)
             {
-                return BadRequest();
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
             }
 
         }

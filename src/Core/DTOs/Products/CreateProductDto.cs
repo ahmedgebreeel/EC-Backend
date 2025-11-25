@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.DTOs.Products
 {
@@ -20,7 +17,7 @@ namespace Core.DTOs.Products
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         [Required]
-        public int Stock { get; set; } = 0;
+        public int Stock { get; set; }
         [Required]
         public string SellerId { get; set; }
 
@@ -29,7 +26,6 @@ namespace Core.DTOs.Products
     }
     public class UpdateProductDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
         [Required]
         [MaxLength(300)]
         public string Name { get; set; }
@@ -40,7 +36,7 @@ namespace Core.DTOs.Products
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         [Required]
-        public int Stock { get; set; } = 0;
+        public int Stock { get; set; }
         [Required]
         public string SellerId { get; set; }
 
