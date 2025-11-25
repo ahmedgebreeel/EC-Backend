@@ -2,6 +2,8 @@ using Business.Services;
 using Data;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,16 +14,22 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//add automapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 //add DB context
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+
 //add UnitOfWork
 builder.Services.AddScoped<UnitOfWork>();
 
 //add CategoryService
 builder.Services.AddScoped<CategoryService>();
-
+builder.Services.AddScoped<CartItemService>();
+builder.Services.AddScoped<ShoppingCartService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
