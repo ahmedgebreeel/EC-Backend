@@ -2,8 +2,7 @@ using Business.Services;
 using Data;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +13,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//add automapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //add DB context
 builder.Services.AddDbContext<AppDbContext>(
@@ -28,8 +25,13 @@ builder.Services.AddScoped<UnitOfWork>();
 
 //add CategoryService
 builder.Services.AddScoped<CategoryService>();
+//add CartItemService and ShoppingCartService
 builder.Services.AddScoped<CartItemService>();
 builder.Services.AddScoped<ShoppingCartService>();
+
+//add ProductService
+builder.Services.AddScoped<ProductService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,18 +47,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.MapControllers();
 
 
-app.MapGet("/test-db", async (AppDbContext db) =>
+app.MapGet("/test-db", async (AppDbContext db, IConfiguration config) =>
 {
     try
     {
+        var connectionString = config.GetConnectionString("DefaultConnection");
         var canConnect = await db.Database.CanConnectAsync();
-        return Results.Ok(new { success = canConnect, message = "Database connection successful!" });
+
+        return Results.Ok(new
+        {
+            success = canConnect,
+            message = canConnect ? "Database connection successful!" : "Connection failed",
+            connectionString
+        });
     }
     catch (Exception ex)
     {
-        return Results.BadRequest(new { error = ex.Message });
+        return Results.BadRequest(new { error = ex.Message, stackTrace = ex.StackTrace });
     }
 });
 

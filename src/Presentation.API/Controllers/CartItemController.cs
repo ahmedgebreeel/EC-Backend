@@ -2,143 +2,116 @@
 using Core.DTOs.CartItem;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.API.Controllers
+namespace Presentation.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class CartItemController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CartItemController : ControllerBase
+    private readonly CartItemService cartItemService;
+
+    public CartItemController(CartItemService _cartItemService)
     {
-        private readonly CartItemService _cartItemService;
-        private readonly ILogger<CartItemController> _logger;
+        cartItemService = _cartItemService;
+    }
 
-        public CartItemController(CartItemService cartItemService, ILogger<CartItemController> logger)
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        try
         {
-            _cartItemService = cartItemService;
-            _logger = logger;
+            var cartItems = await cartItemService.GetAllAsync();
+            return Ok(cartItems);
         }
-
-        // Get all cart items
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        catch (Exception ex)
         {
-            try
-            {
-                var items = await _cartItemService.GetAllAsync();
-                return Ok(items);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving all cart items");
-                return StatusCode(500, "Internal server error");
-            }
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
+    }
 
-        // Get cart item by ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCartItemById(string id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(string id)
+    {
+        try
         {
-            try
+            var cartItem = await cartItemService.GetByIdAsync(id);
+            if (cartItem == null)
             {
-                var item = await _cartItemService.GetCartItemByIdAsync(id);
-                if (item == null)
-                    return NotFound("Cart item not found");
+                return NotFound("Cart item not found");
+            }
 
-                return Ok(item);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving cart item with ID: {CartItemId}", id);
-                return StatusCode(500, "Internal server error");
-            }
+            return Ok(cartItem);
         }
-
-        // Add cart item
-        [HttpPost("add")]
-        public async Task<IActionResult> AddCartItem([FromBody] AddCartItemDto addCartItemDto)
+        catch (Exception ex)
         {
-            try
-            {
-                var createdItem = await _cartItemService.AddCartItemAsync(addCartItemDto);
-                _logger.LogInformation("Cart item added successfully. CartId: {CartId}, ProductId: {ProductId}",
-                    addCartItemDto.CartId, addCartItemDto.ProductId);
-                return CreatedAtAction(nameof(GetCartItemById), new { id = createdItem.Id }, createdItem);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning("Add cart item failed: {Message}", ex.Message);
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while adding cart item");
-                return StatusCode(500, "Internal server error");
-            }
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
+    }
 
-        // Update cart item
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCartItem(string id, [FromBody] UpdateCartItemDto updateCartItemDto)
+    [HttpPost]
+    public async Task<IActionResult> AddAsync(AddCartItemDto addCartItemDto)
+    {
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                await _cartItemService.UpdateCartItemAsync(id, updateCartItemDto);
-                _logger.LogInformation("Cart item updated successfully. CartItemId: ", id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while updating cart item with ID: {CartItemId}", id);
-                return StatusCode(500, "Internal server error");
-            }
+            return BadRequest(ModelState);
         }
-
-        // Delete cart item
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCartItem(string id)
+        try
         {
-            try
-            {
-                await _cartItemService.DeleteCartItemAsync(id);
-                _logger.LogInformation("Cart item deleted successfully. CartItemId: {CartItemId}", id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while deleting cart item with ID: {CartItemId}", id);
-                return StatusCode(500, "Internal server error");
-            }
+            await cartItemService.AddAsync(addCartItemDto);
+            return Created();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(string id, UpdateCartItemDto updateCartItemDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        try
+        {
+            await cartItemService.UpdateAsync(id, updateCartItemDto);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(string id)
+    {
+        try
+        {
+            await cartItemService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
     }
 }

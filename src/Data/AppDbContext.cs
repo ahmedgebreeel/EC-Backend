@@ -118,12 +118,13 @@ public class AppDbContext : DbContext
         {
             // ShoppingCart-User relationship (One-to-One or One-to-Many)
             entity.HasOne(sc => sc.User)
-                .WithMany(u => u.ShoppingCarts)
-                .HasForeignKey(sc => sc.UserId)
+                .WithOne(u => u.ShoppingCart)
+                .HasForeignKey<ShoppingCart>(sc => sc.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Index
-            entity.HasIndex(sc => sc.UserId);
+            entity.HasIndex(sc => sc.UserId)
+            .IsUnique();
         });
 
         // ============================================

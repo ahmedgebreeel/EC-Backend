@@ -34,7 +34,7 @@ public class User
 
     // Navigation properties for related entities
     public virtual ICollection<Product> Products { get; set; } = new List<Product>(); // Products sold by this user
-    public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; } = new List<ShoppingCart>();
+    public virtual ShoppingCart? ShoppingCart { get; set; }
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 

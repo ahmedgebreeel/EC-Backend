@@ -67,3 +67,12 @@ secrets.json
 
 # Docker
 docker-compose.override.yml
+
+
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.vsidx
+

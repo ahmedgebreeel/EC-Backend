@@ -2,101 +2,113 @@
 using Core.DTOs.ShoppingCart;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Presentation.API.Controllers;
 
-namespace API.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class ShoppingCartController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ShoppingCartController : ControllerBase
+    private readonly ShoppingCartService shoppingCartService;
+
+    public ShoppingCartController(ShoppingCartService _shoppingCartService)
     {
-        private readonly ShoppingCartService _shoppingCartService;
+        shoppingCartService = _shoppingCartService;
+    }
 
-        public ShoppingCartController(ShoppingCartService shoppingCartService)
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        try
         {
-            _shoppingCartService = shoppingCartService;
+            var carts = await shoppingCartService.GetAllAsync();
+            return Ok(carts);
         }
-
-        // Get all shopping carts
-        [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        catch (Exception ex)
         {
-            try
-            {
-                var carts = await _shoppingCartService.GetAllCartsAsync();
-                return Ok(carts);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
-            }
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
+    }
 
-        // Get Shopping Cart by Id
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(string id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(string id)
+    {
+        try
         {
-            try
+            var cart = await shoppingCartService.GetByIdAsync(id);
+            if (cart == null)
             {
-                var cart = await _shoppingCartService.GetCartByIdAsync(id);
-                if (cart == null)
-                {
-                    return NotFound("Shopping cart not found");
-                }
-                return Ok(cart);
+                return NotFound("Shopping cart not found");
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
-            }
+
+            return Ok(cart);
         }
-
-        // Create Shopping Cart
-        [HttpPost]
-        public async Task<IActionResult> AddAsync([FromBody] AddShoppingCartDto addCartDto)
+        catch (Exception ex)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            try
-            {
-                // Map AddShoppingCartDto to ShoppingCartDto (assuming AddCartItems if needed)
-                var cartDto = new ShoppingCartDto
-                {
-                    UserId = addCartDto.UserId
-                    // You can map CartItems here if AddShoppingCartDto includes any
-                };
-
-                var createdCart = await _shoppingCartService.AddCartAsync(cartDto);
-                return CreatedAtAction(nameof(GetByIdAsync), new { id = createdCart.Id }, createdCart);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
-            }
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
+    }
 
-        // Delete Shopping Cart
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(string id)
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUserIdAsync(string userId)
+    {
+        try
         {
-            try
+            var cart = await shoppingCartService.GetByUserIdAsync(userId);
+            if (cart == null)
             {
-                await _shoppingCartService.DeleteCartAsync(id);
-                return NoContent();
+                return NotFound("Shopping cart not found for this user");
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
-            }
+
+            return Ok(cart);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddAsync(AddShoppingCartDto addShoppingCartDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        try
+        {
+            await shoppingCartService.AddAsync(addShoppingCartDto);
+            return Created();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(string id)
+    {
+        try
+        {
+            await shoppingCartService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "Internal server error");
         }
     }
 }
