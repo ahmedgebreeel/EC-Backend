@@ -60,8 +60,9 @@ public class AuthService : IAuthService
             // Assign default role (optional - uncomment if using roles)
             // await userManager.AddToRoleAsync(user, "Customer");
 
-            // Generate token
-            var token = tokenService.GenerateToken(user);
+            // Get user roles and generate token
+            var roles = await userManager.GetRolesAsync(user);
+            var token = tokenService.GenerateToken(user, roles);
 
             return new AuthResponseDto
             {
@@ -113,8 +114,9 @@ public class AuthService : IAuthService
                 };
             }
 
-            // Generate token
-            var token = tokenService.GenerateToken(user);
+            // Get user roles and generate token
+            var roles = await userManager.GetRolesAsync(user);
+            var token = tokenService.GenerateToken(user, roles);
 
             return new AuthResponseDto
             {

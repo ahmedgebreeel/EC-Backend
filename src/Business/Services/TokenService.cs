@@ -9,7 +9,7 @@ namespace Business.Services;
 
 public interface ITokenService
 {
-    string GenerateToken(User user);
+    string GenerateToken(User user, IList<string>? roles = null);
 }
 
 public class TokenService : ITokenService
@@ -21,7 +21,7 @@ public class TokenService : ITokenService
         this.configuration = configuration;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(User user, IList<string>? roles = null)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
@@ -39,8 +39,15 @@ public class TokenService : ITokenService
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Email, user.Email ?? ""),
-            new Claim(ClaimTypes.Name, user.FullName ?? user.UserName ?? "")
+            new Claim(ClaimTypes.Name, user.FullName ?? user.UserName ?? ""),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        // Add roles to claims if provided
+        if (roles != null && roles.Any())
+        {
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        }
 
         var token = new JwtSecurityToken(
             issuer: issuer,
