@@ -1,9 +1,7 @@
 using Business.Services;
 using Data;
 using Data.Repositories;
-using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Presentation.API.Midllewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,17 +25,20 @@ builder.Services.AddScoped<CategoryService>();
 //add ProductService
 builder.Services.AddScoped<ProductService>();
 
+//Configure AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-     app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "";
-    });
+    app.UseSwaggerUI(c =>
+   {
+       c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+       c.RoutePrefix = "";
+   });
 }
 
 app.UseHttpsRedirection();
