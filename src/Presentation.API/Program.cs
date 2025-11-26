@@ -1,7 +1,12 @@
 using Business.Services;
+using Core.Entities;
 using Data;
 using Data.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +21,54 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+// Add Identity
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"];
+var issuer = jwtSettings["Issuer"];
+var audience = jwtSettings["Audience"];
+
+if (string.IsNullOrEmpty(secretKey))
+    throw new InvalidOperationException("JWT secret key is not configured");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
 //add UnitOfWork
 builder.Services.AddScoped<UnitOfWork>();
+
+//add Authentication services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 //add CategoryService
 builder.Services.AddScoped<CategoryService>();
@@ -41,7 +92,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 

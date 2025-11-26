@@ -1,15 +1,14 @@
 using Core.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<User>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // DbSets for all entities
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
@@ -82,18 +81,10 @@ public class AppDbContext : DbContext
         // ============================================
         modelBuilder.Entity<User>(entity =>
         {
-            // Unique email constraint
-            entity.HasIndex(u => u.Email)
-                .IsUnique();
-
-            // User-Role relationship
-            entity.HasOne(u => u.Role)
-                .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            // Unique email constraint is already handled by Identity
+            
             // Indexes
-            entity.HasIndex(u => u.RoleId);
+            entity.HasIndex(u => u.Email);
         });
 
         // ============================================
@@ -190,16 +181,6 @@ public class AppDbContext : DbContext
 
             // Index
             entity.HasIndex(oi => new { oi.OrderId, oi.ProductId });
-        });
-
-        // ============================================
-        // ROLE CONFIGURATION
-        // ============================================
-        modelBuilder.Entity<Role>(entity =>
-        {
-            // Unique role name
-            entity.HasIndex(r => r.Name)
-                .IsUnique();
         });
     }
 }

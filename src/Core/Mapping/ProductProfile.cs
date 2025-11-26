@@ -32,7 +32,7 @@ namespace Core.Mapping
                 opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.SellerName,
                 opt =>
-                opt.MapFrom(src => src.Seller.Name))
+                opt.MapFrom(src => src.Seller.FullName ?? src.Seller.UserName ?? ""))
                 .ForMember(dest => dest.Images,
                 opt =>
                 opt.MapFrom(src => src.Images))

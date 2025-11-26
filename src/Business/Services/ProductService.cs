@@ -3,11 +3,7 @@ using Core.DTOs.Products;
 using Core.Entities;
 using Core.Enums;
 using Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace Business.Services
 {
@@ -15,11 +11,13 @@ namespace Business.Services
     {
         private readonly UnitOfWork unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> userManager;
 
-        public ProductService(UnitOfWork _unitOfWork, IMapper mapper)
+        public ProductService(UnitOfWork _unitOfWork, IMapper mapper, UserManager<User> userManager)
         {
             unitOfWork = _unitOfWork;
             _mapper = mapper;
+            this.userManager = userManager;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
@@ -29,13 +27,13 @@ namespace Business.Services
                 .GetAllAsync();
 
             return _mapper.Map<List<ProductDto>>(products);
-                
+
         }
 
 
         public async Task<ProductDetailsDto?> GetByIdAsync(string id)
         {
-            var product =  await unitOfWork
+            var product = await unitOfWork
                .Products
                .GetByIdAsync(id);
 
@@ -44,7 +42,7 @@ namespace Business.Services
             return _mapper.Map<ProductDetailsDto?>(product);
         }
 
-       public async Task AddAsync(CreateProductDto product)
+        public async Task AddAsync(CreateProductDto product)
         {
             //check if category is exist
             var category = await unitOfWork.Repository<Category>()
@@ -56,16 +54,17 @@ namespace Business.Services
             if (seller == null) throw new KeyNotFoundException("Seller not found");
 
             //make sure its role is a seller
-            if(seller.Role.Name != RoleType.Seller.ToString()) throw new InvalidOperationException("User is not a seller");
+            var isSellerRole = await userManager.IsInRoleAsync(seller, RoleType.Seller.ToString());
+            if (!isSellerRole) throw new InvalidOperationException("User is not a seller");
 
             //ToDo: saving the images !!
             await unitOfWork.Products
                 .AddAsync(_mapper.Map<Product>(product));
 
-            await unitOfWork.SaveChangesAsync();    
+            await unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync (string id, UpdateProductDto updateProductDto)
+        public async Task UpdateAsync(string id, UpdateProductDto updateProductDto)
         {
             var product = await unitOfWork
                 .Repository<Product>()
@@ -81,7 +80,7 @@ namespace Business.Services
             var seller = await unitOfWork.Repository<User>()
                 .GetByIdAsync(updateProductDto.SellerId);
             if (seller == null) throw new KeyNotFoundException("Seller not found");
-            
+
             product.Name = updateProductDto.Name;
             product.Description = updateProductDto.Description;
             product.Price = updateProductDto.Price;
