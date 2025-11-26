@@ -8,7 +8,5 @@ namespace Core.DTOs.ShoppingCart
     {
         [Required(ErrorMessage = "UserId is required.")]
         public string UserId { get; set; }
-
-        public List<AddCartItemDto> CartItems { get; set; } = new List<AddCartItemDto>();
     }
 }
