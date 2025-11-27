@@ -22,11 +22,11 @@ namespace Business.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync()
+        public async Task<IEnumerable<ProductDto>> GetAllAsync(int pageNum = 1, int pageSize = 10)
         {
             var products = await unitOfWork
                 .Products
-                .GetAllAsync();
+                .GetAllAsync(pageNum,pageSize);
 
             return _mapper.Map<List<ProductDto>>(products);
                 

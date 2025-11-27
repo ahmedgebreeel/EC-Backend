@@ -20,7 +20,7 @@ namespace Core.Mapping
                 .ForMember(dest => dest.CategoryName,
                 opt =>
                 opt.MapFrom(src => src.Category.Name))
-                .ForMember(dest => dest.Images,
+                .ForMember(dest => dest.Image,
                 opt =>
                 opt.MapFrom(src =>  src.Images.Select(i => i.ImageUrl).FirstOrDefault()))
                 .ReverseMap();

@@ -14,10 +14,10 @@ namespace Presentation.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync() {
+        public async Task<IActionResult> GetAllAsync([FromQuery]int pageNum=1 , [FromQuery] int pageSize=10) {
             try
             {
-                var produts = await productService.GetAllAsync();
+                var produts = await productService.GetAllAsync(pageNum,pageSize);
                 return Ok(produts);
             }
             catch (Exception ex)

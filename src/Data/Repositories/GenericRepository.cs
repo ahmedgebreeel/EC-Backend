@@ -17,8 +17,17 @@ namespace Data.Repositories
             context = _context;
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync(int? pageNum =null , int? pageSize=null)
         {
+            if(pageNum != null && pageSize != null)
+            {
+                return await context.Set<T>()
+                    .Skip(((pageNum - 1) * pageSize??0))
+                    .Take(pageSize??10)
+                    .ToListAsync();
+               
+                
+            }
             return await context.Set<T>().ToListAsync();
         }
         

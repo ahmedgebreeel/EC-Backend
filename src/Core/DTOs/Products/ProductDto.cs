@@ -14,7 +14,7 @@ namespace Core.DTOs.Products
         public string CategoryName { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string Images {  get; set; }
+        public string Image {  get; set; }
 
     }
 
