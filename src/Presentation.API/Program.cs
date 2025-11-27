@@ -1,4 +1,5 @@
 using Business.Services;
+using Core.Mapping;
 using Data;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,15 @@ builder.Services.AddScoped<ShoppingCartService>();
 
 //add ProductService
 builder.Services.AddScoped<ProductService>();
+
+
+// Register AutoMapper
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ProductProfile>();
+    // add more profiles here if needed
+});
+
 
 var app = builder.Build();
 

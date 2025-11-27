@@ -56,7 +56,7 @@ namespace Business.Services
             if (seller == null) throw new KeyNotFoundException("Seller not found");
 
             //make sure its role is a seller
-            if(seller.Role.Name != RoleType.Seller.ToString()) throw new InvalidOperationException("User is not a seller");
+            if(seller.Role.Name != RoleType.Seller.ToString() && seller.Role.Name != RoleType.Admin.ToString()) throw new InvalidOperationException("User is not a seller");
 
             //ToDo: saving the images !!
             await unitOfWork.Products
