@@ -24,6 +24,11 @@ namespace Business.Services
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync(int pageNum = 1, int pageSize = 10)
         {
+            const int maxPageSize = 50;
+            if (pageSize > maxPageSize)
+            {
+                pageSize = maxPageSize;
+            }
             var products = await unitOfWork
                 .Products
                 .GetAllAsync(pageNum,pageSize);

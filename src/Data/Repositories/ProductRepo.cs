@@ -13,11 +13,6 @@ namespace Data.Repositories
 
         public override async Task<IEnumerable<Product>> GetAllAsync(int? pageNum = 1, int? pageSize=10)
         {
-            const int maxPageSize = 50;
-            if(pageSize > maxPageSize)
-            {
-                pageSize = maxPageSize;
-            }
             return await context.Products
                 .Include(p=>p.Category)
                 .Include(p=>p.Images)

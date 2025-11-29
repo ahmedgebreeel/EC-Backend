@@ -19,10 +19,10 @@ namespace Data.Repositories
 
         public virtual async Task<IEnumerable<T>> GetAllAsync(int? pageNum =null , int? pageSize=null)
         {
-            if(pageNum != null && pageSize != null)
+            if(pageNum is not null && pageSize is not null )
             {
                 return await context.Set<T>()
-                    .Skip(((pageNum - 1) * pageSize??0))
+                    .Skip((pageNum - 1) * pageSize??0)
                     .Take(pageSize??10)
                     .ToListAsync();
                
