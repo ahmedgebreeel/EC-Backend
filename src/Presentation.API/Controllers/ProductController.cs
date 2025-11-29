@@ -14,7 +14,7 @@ namespace Presentation.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery]int pageNum=1 , [FromQuery] int pageSize=10) {
+        public async Task<IActionResult> GetAllAsync([FromQuery]int? pageNum , [FromQuery] int? pageSize) {
             try
             {
                 var produts = await productService.GetAllAsync(pageNum,pageSize);

@@ -22,13 +22,8 @@ namespace Business.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(int pageNum = 1, int pageSize = 10)
+        public async Task<IEnumerable<ProductDto>> GetAllAsync(int? pageNum, int? pageSize)
         {
-            const int maxPageSize = 50;
-            if (pageSize > maxPageSize)
-            {
-                pageSize = maxPageSize;
-            }
             var products = await unitOfWork
                 .Products
                 .GetAllAsync(pageNum,pageSize);

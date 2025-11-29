@@ -25,8 +25,6 @@ namespace Data.Repositories
                     .Skip((pageNum - 1) * pageSize??0)
                     .Take(pageSize??10)
                     .ToListAsync();
-               
-                
             }
             return await context.Set<T>().ToListAsync();
         }
