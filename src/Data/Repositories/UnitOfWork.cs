@@ -10,6 +10,7 @@ namespace Data.Repositories
 
         private ProductRepo products ;
         private UserRepository users;
+        private OrderRepo orders;
 
         public UnitOfWork(AppDbContext _context)
         {
@@ -46,6 +47,18 @@ namespace Data.Repositories
                     users = new UserRepository(context);
                 }
                 return users;
+            }
+        }
+
+        public OrderRepo Orders
+        {
+            get
+            {
+                if(orders == null)
+                {
+                    orders = new OrderRepo(context);
+                }
+                return orders;
             }
         }
  
