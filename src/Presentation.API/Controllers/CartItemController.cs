@@ -15,40 +15,41 @@ public class CartItemController : ControllerBase
         cartItemService = _cartItemService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
-    {
-        try
-        {
-            var cartItems = await cartItemService.GetAllAsync();
-            return Ok(cartItems);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return StatusCode(500, "Internal server error");
-        }
-    }
+    // these 2 methods are not needed
+    // [HttpGet]
+    // public async Task<IActionResult> GetAllAsync()
+    // {
+    //     try
+    //     {
+    //         var cartItems = await cartItemService.GetAllAsync();
+    //         return Ok(cartItems);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(ex);
+    //         return StatusCode(500, "Internal server error");
+    //     }
+    // }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync(string id)
-    {
-        try
-        {
-            var cartItem = await cartItemService.GetByIdAsync(id);
-            if (cartItem == null)
-            {
-                return NotFound("Cart item not found");
-            }
+    // [HttpGet("{id}")]
+    // public async Task<IActionResult> GetByIdAsync(string id)
+    // {
+    //     try
+    //     {
+    //         var cartItem = await cartItemService.GetByIdAsync(id);
+    //         if (cartItem == null)
+    //         {
+    //             return NotFound("Cart item not found");
+    //         }
 
-            return Ok(cartItem);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return StatusCode(500, "Internal server error");
-        }
-    }
+    //         return Ok(cartItem);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(ex);
+    //         return StatusCode(500, "Internal server error");
+    //     }
+    // }
 
     [HttpPost]
     public async Task<IActionResult> AddAsync(AddCartItemDto addCartItemDto)

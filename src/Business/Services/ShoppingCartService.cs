@@ -1,4 +1,5 @@
-﻿using Core.DTOs.ShoppingCart;
+﻿using Core.DTOs.CartItem;
+using Core.DTOs.ShoppingCart;
 using Core.Entities;
 using Data.Repositories;
 
@@ -15,7 +16,7 @@ namespace Business.Services
 
         public async Task<IEnumerable<ShoppingCartDto>> GetAllAsync()
         {
-            var carts = await _unitOfWork.Repository<ShoppingCart>().GetAllAsync();
+            var carts = await _unitOfWork.Cart.GetAllAsync();
 
             var shoppingCartDtos = carts.Select(cart => new ShoppingCartDto
             {
@@ -23,15 +24,15 @@ namespace Business.Services
                 UserId = cart.UserId,
                 CreatedAt = cart.CreatedAt,
                 UpdatedAt = cart.UpdatedAt,
-                CartItems = cart.CartItems?.Select(ci => new Core.DTOs.CartItem.CartItemDto
+                CartItems = cart.CartItems?.Select(ci => new CartItemDto
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    ProductId = ci.ProductId,
+                    product = ci.Product,
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt
-                }).ToList() ?? new List<Core.DTOs.CartItem.CartItemDto>()
+                }).ToList() ?? new List<CartItemDto>()
             });
 
             return shoppingCartDtos;
@@ -39,7 +40,7 @@ namespace Business.Services
 
         public async Task<ShoppingCartDto?> GetByIdAsync(string id)
         {
-            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(id);
+            var cart = await _unitOfWork.Cart.GetByIdAsync(id);
             if (cart == null)
             {
                 return null;
@@ -51,23 +52,22 @@ namespace Business.Services
                 UserId = cart.UserId,
                 CreatedAt = cart.CreatedAt,
                 UpdatedAt = cart.UpdatedAt,
-                CartItems = cart.CartItems?.Select(ci => new Core.DTOs.CartItem.CartItemDto
+                CartItems = cart.CartItems?.Select(ci => new CartItemDto
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    ProductId = ci.ProductId,
+                    product = ci.Product,
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt
-                }).ToList() ?? new List<Core.DTOs.CartItem.CartItemDto>()
+                }).ToList() ?? new List<CartItemDto>()
             };
             return shoppingCartDto;
         }
 
         public async Task<ShoppingCartDto?> GetByUserIdAsync(string userId)
         {
-            var carts = await _unitOfWork.Repository<ShoppingCart>().GetAllAsync();
-            var userCart = carts.FirstOrDefault(c => c.UserId == userId);
+            var userCart = await _unitOfWork.Cart.GetByUserIdAsync(userId);
 
             if (userCart == null)
             {
@@ -80,15 +80,15 @@ namespace Business.Services
                 UserId = userCart.UserId,
                 CreatedAt = userCart.CreatedAt,
                 UpdatedAt = userCart.UpdatedAt,
-                CartItems = userCart.CartItems?.Select(ci => new Core.DTOs.CartItem.CartItemDto
+                CartItems = userCart.CartItems?.Select(ci => new CartItemDto
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    ProductId = ci.ProductId,
+                    product = ci.Product,
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt
-                }).ToList() ?? new List<Core.DTOs.CartItem.CartItemDto>()
+                }).ToList() ?? new List<CartItemDto>()
             };
             return shoppingCartDto;
         }
@@ -96,7 +96,7 @@ namespace Business.Services
         public async Task AddAsync(AddShoppingCartDto addShoppingCartDto)
         {
             // Check if user already has a cart
-            var existingCart = await _unitOfWork.Repository<ShoppingCart>()
+            var existingCart = await _unitOfWork.Cart
                 .FindAsync(c => c.UserId == addShoppingCartDto.UserId);
 
             if (existingCart.Any())
@@ -104,7 +104,7 @@ namespace Business.Services
                 throw new InvalidOperationException("User already has a shopping cart.");
             }
 
-            await _unitOfWork.Repository<ShoppingCart>().AddAsync(new ShoppingCart
+            await _unitOfWork.Cart.AddAsync(new ShoppingCart
             {
                 UserId = addShoppingCartDto.UserId,
                 CreatedAt = DateTime.UtcNow,
@@ -116,13 +116,13 @@ namespace Business.Services
 
         public async Task DeleteAsync(string id)
         {
-            var cart = await _unitOfWork.Repository<ShoppingCart>().GetByIdAsync(id);
+            var cart = await _unitOfWork.Cart.GetByIdAsync(id);
             if (cart == null)
             {
                 throw new KeyNotFoundException("Shopping cart not found");
             }
 
-            _unitOfWork.Repository<ShoppingCart>().Delete(cart);
+            _unitOfWork.Cart.Delete(cart);
             await _unitOfWork.SaveChangesAsync();
         }
     }

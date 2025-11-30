@@ -70,45 +70,46 @@ public class ShoppingCartController : ControllerBase
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddAsync(AddShoppingCartDto addShoppingCartDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        try
-        {
-            await shoppingCartService.AddAsync(addShoppingCartDto);
-            return Created();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return StatusCode(500, "Internal server error");
-        }
-    }
+    // these 2 methods are not needed
+    // [HttpPost]
+    // public async Task<IActionResult> AddAsync(AddShoppingCartDto addShoppingCartDto)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //     try
+    //     {
+    //         await shoppingCartService.AddAsync(addShoppingCartDto);
+    //         return Created();
+    //     }
+    //     catch (InvalidOperationException ex)
+    //     {
+    //         return BadRequest(ex.Message);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(ex);
+    //         return StatusCode(500, "Internal server error");
+    //     }
+    // }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(string id)
-    {
-        try
-        {
-            await shoppingCartService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return StatusCode(500, "Internal server error");
-        }
-    }
+    // [HttpDelete("{id}")]
+    // public async Task<IActionResult> DeleteAsync(string id)
+    // {
+    //     try
+    //     {
+    //         await shoppingCartService.DeleteAsync(id);
+    //         return NoContent();
+    //     }
+    //     catch (KeyNotFoundException ex)
+    //     {
+    //         return NotFound(ex.Message);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(ex);
+    //         return StatusCode(500, "Internal server error");
+    //     }
+    // }
 }

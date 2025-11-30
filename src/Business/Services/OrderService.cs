@@ -1,12 +1,6 @@
 ﻿using Core.DTOs.OrderItems;
 using Core.DTOs.Orders;
-using Core.Entities;
 using Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Services
 {
@@ -29,16 +23,18 @@ namespace Business.Services
                 UserName = o.User.Name,
                 Status = o.Status,
                 Total = o.Total,
-                AddressId = o.AddressId,
                 Address = o.Address,
+                CreatedAt = o.CreatedAt,
+                UpdatedAt = o.UpdatedAt,
                 OrderItems = o.OrderItems.Select(oi => new OrderItemsDto
                 {
                     Id = oi.Id,
                     OrderId = oi.Id,
-                    ProductId = oi.ProductId,
                     Product = oi.Product,   
                     Price = oi.Price,
                     Quantity = oi.Quantity,
+                    CreatedAt = oi.CreatedAt,
+                    UpdatedAt = oi.UpdatedAt
                 }).ToList()
             }).ToList();
             return orderDto;
@@ -58,16 +54,18 @@ namespace Business.Services
                 UserName = order.User.Name,
                 Status = order.Status,
                 Total = order.Total,
-                AddressId = order.AddressId,
                 Address = order.Address,
+                CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt,
                 OrderItems = order.OrderItems.Select(oi => new OrderItemsDto
                 {
                     Id = oi.Id,
                     OrderId = oi.Id,
-                    ProductId = oi.ProductId,
                     Product = oi.Product,
                     Price = oi.Price,
                     Quantity = oi.Quantity,
+                    CreatedAt = oi.CreatedAt,
+                    UpdatedAt = oi.UpdatedAt
                 }).ToList()
 
             };
@@ -88,16 +86,18 @@ namespace Business.Services
                 UserName = order.User.Name,
                 Status = order.Status,
                 Total = order.Total,
-                AddressId = order.AddressId,
                 Address = order.Address,
+                CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt,
                 OrderItems = order.OrderItems.Select(oi => new OrderItemsDto
                 {
                     Id = oi.Id,
                     OrderId = oi.Id,
-                    ProductId = oi.ProductId,
                     Product = oi.Product,
                     Price = oi.Price,
                     Quantity = oi.Quantity,
+                    CreatedAt = oi.CreatedAt,
+                    UpdatedAt = oi.UpdatedAt
                 }).ToList()
 
             };

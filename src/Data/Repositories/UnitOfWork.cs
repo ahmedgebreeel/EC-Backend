@@ -12,6 +12,8 @@ namespace Data.Repositories
         private UserRepository users;
         private OrderRepo orders;
 
+        private ShoppingCartRepo cart;
+
         public UnitOfWork(AppDbContext _context)
         {
             context = _context;
@@ -59,6 +61,18 @@ namespace Data.Repositories
                     orders = new OrderRepo(context);
                 }
                 return orders;
+            }
+        }
+
+        public ShoppingCartRepo Cart
+        {
+            get
+            {
+                if (cart == null)
+                {
+                    cart = new ShoppingCartRepo(context);
+                }
+                return cart;
             }
         }
  

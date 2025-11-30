@@ -1,10 +1,5 @@
 ﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
@@ -14,7 +9,7 @@ namespace Data.Repositories
         {
         }
 
-        public override async Task<IEnumerable<Order>> GetAllAsync(int? pageNum, int? pageSize)
+        public override async Task<IEnumerable<Order>> GetAllAsync(int? pageNum =  null, int? pageSize = null)
         {
             if (pageNum is not null && pageSize is not null) {
                 return await context.Orders

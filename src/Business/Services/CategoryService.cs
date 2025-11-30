@@ -22,7 +22,9 @@ namespace Business.Services
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
-                ParentCategoryId = c.ParentCategoryId
+                ParentCategoryId = c.ParentCategoryId,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
             });
 
             return categoryDTOs;
@@ -41,7 +43,9 @@ namespace Business.Services
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                ParentCategoryId = category.ParentCategoryId
+                ParentCategoryId = category.ParentCategoryId,
+                CreatedAt = category.CreatedAt,
+                UpdatedAt = category.UpdatedAt
             };
             return categoryDto; 
         }

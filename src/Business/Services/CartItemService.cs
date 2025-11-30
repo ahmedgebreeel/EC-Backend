@@ -21,7 +21,7 @@ namespace Business.Services
             {
                 Id = item.Id,
                 CartId = item.CartId,
-                ProductId = item.ProductId,
+                product = item.Product,
                 Quantity = item.Quantity,
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
@@ -42,7 +42,7 @@ namespace Business.Services
             {
                 Id = cartItem.Id,
                 CartId = cartItem.CartId,
-                ProductId = cartItem.ProductId,
+                product = cartItem.Product,
                 Quantity = cartItem.Quantity,
                 CreatedAt = cartItem.CreatedAt,
                 UpdatedAt = cartItem.UpdatedAt

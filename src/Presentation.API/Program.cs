@@ -24,14 +24,12 @@ builder.Services.AddDbContext<AppDbContext>(
 //add UnitOfWork
 builder.Services.AddScoped<UnitOfWork>();
 
-//add CategoryService
+//Add Services
 builder.Services.AddScoped<CategoryService>();
-//add CartItemService and ShoppingCartService
 builder.Services.AddScoped<CartItemService>();
 builder.Services.AddScoped<ShoppingCartService>();
-
-//add ProductService
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<OrderService>();
 
 
 // Register AutoMapper
@@ -56,7 +54,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
 app.MapControllers();
 
 
