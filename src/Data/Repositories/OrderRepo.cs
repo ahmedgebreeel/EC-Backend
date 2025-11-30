@@ -14,8 +14,19 @@ namespace Data.Repositories
         {
         }
 
-        public override async Task<IEnumerable<Order>> GetAllAsync(int? pageNum = null, int? pageSize = null)
+        public override async Task<IEnumerable<Order>> GetAllAsync(int? pageNum, int? pageSize)
         {
+            if (pageNum is not null && pageSize is not null) {
+                return await context.Orders
+                .Include(o => o.User)
+                .Include(o => o.Address)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Skip((pageNum - 1) * pageSize ??0)
+                .Take(pageSize ?? 20)
+                .ToListAsync();
+
+            }
 
            return await context.Orders
                 .Include(o => o.User)

@@ -15,7 +15,6 @@ namespace Core.DTOs.Orders
         public string UserName { get; set; }
         public string Status { get; set; }
         public decimal Total { get; set; }
-        public string AddressId { get; set; }
         public Address Address { get; set; }
 
         public ICollection<OrderItemsDto> OrderItems { get; set; } = new List<OrderItemsDto>();
