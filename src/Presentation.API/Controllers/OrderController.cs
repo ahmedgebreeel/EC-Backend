@@ -1,4 +1,5 @@
 ﻿using Business.Services;
+using Core.DTOs.Orders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,6 +70,27 @@ namespace Presentation.API.Controllers
                 Console.WriteLine(ex);
                 return StatusCode(500, "Internal server error");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAsync(AddOrderDto order)
+        {
+            try {
+
+                await orderService.AddAsync(order);
+                return Ok("Order created successfully ");
+
+            }
+            catch(InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500, "Internal server error");
+            }
+            
         }
     }
 }
