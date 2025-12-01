@@ -1,5 +1,6 @@
 ﻿using Core.DTOs.OrderItems;
 using Core.DTOs.Orders;
+using Core.Entities;
 using Data.Repositories;
 
 namespace Business.Services
@@ -104,5 +105,48 @@ namespace Business.Services
             return orderDto;
 
         }
+    
+        
+        public async Task AddAsync(AddOrderDto order)
+        {
+            var exisitingUser = await unitOfWork.Users.GetByIdAsync(order.UserId);
+            if (exisitingUser == null)
+            {
+                throw new InvalidOperationException("User does not exist.");
+            }
+            var existingAddress = await unitOfWork.Repository<Address>().GetByIdAsync(order.AddressId);
+
+            if (existingAddress == null)
+            {
+                throw new InvalidOperationException("Address does not exist.");
+            }
+
+            var newOrder = new Order
+            {
+                UserId = order.UserId,
+                Status = order.Status.ToString(),
+                Total = order.Total,
+                AddressId = order.AddressId,
+            };
+
+            await unitOfWork.Orders.AddAsync(newOrder );
+            foreach (var item in order.OrderItems)
+            {
+                await unitOfWork.Repository<OrderItem>().AddAsync(
+                    new OrderItem
+                    {
+                        OrderId = newOrder.Id,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        Price = item.Price
+                    }
+                    );
+            }
+            await unitOfWork.SaveChangesAsync();
+        }
+
+
+
+
     }
 }
