@@ -9,9 +9,11 @@ namespace Presentation.API.Controllers;
 public class CategoryController: ControllerBase
 {
     private readonly CategoryService categoryService;
-    public CategoryController(CategoryService _categoryService)
+    private readonly ILogger<CategoryController> logger;
+    public CategoryController(CategoryService _categoryService, ILogger<CategoryController> _logger)
     {
         categoryService = _categoryService;
+        logger = _logger;
     }
 
     [HttpGet]
@@ -24,7 +26,7 @@ public class CategoryController: ControllerBase
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex);
+        logger.LogError(ex.Message);
         return StatusCode(500, "Internal server error");
       }   
     }
@@ -44,7 +46,7 @@ public class CategoryController: ControllerBase
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex);
+        logger.LogError(ex.Message);
         return StatusCode(500, "Internal server error");
       }   
     }
@@ -63,11 +65,12 @@ public class CategoryController: ControllerBase
       }
       catch (InvalidOperationException ex)
       {
+        logger.LogError(ex.Message);
         return BadRequest(ex.Message);
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex);
+        logger.LogError(ex.Message);
         return StatusCode(500, "Internal server error");
       }   
     }
@@ -86,11 +89,12 @@ public class CategoryController: ControllerBase
       }
       catch (KeyNotFoundException ex)
       {
+        logger.LogError(ex.Message);
         return NotFound(ex.Message);
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex);
+        logger.LogError(ex.Message);
         return StatusCode(500, "Internal server error");
       }   
     }
@@ -105,11 +109,12 @@ public class CategoryController: ControllerBase
       }
       catch (KeyNotFoundException ex)
       {
+        logger.LogError(ex.Message);
         return NotFound(ex.Message);
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex);
+        logger.LogError(ex.Message);
         return StatusCode(500, "Internal server error");
       }   
     }

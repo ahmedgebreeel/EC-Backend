@@ -9,10 +9,12 @@ namespace Presentation.API.Controllers;
 public class ShoppingCartController : ControllerBase
 {
     private readonly ShoppingCartService shoppingCartService;
+    private readonly ILogger<ShoppingCartController> logger;
 
-    public ShoppingCartController(ShoppingCartService _shoppingCartService)
+    public ShoppingCartController(ShoppingCartService _shoppingCartService, ILogger<ShoppingCartController> _logger)
     {
         shoppingCartService = _shoppingCartService;
+        logger = _logger;
     }
 
     [HttpGet]
@@ -25,7 +27,7 @@ public class ShoppingCartController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -45,7 +47,7 @@ public class ShoppingCartController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -65,7 +67,7 @@ public class ShoppingCartController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }

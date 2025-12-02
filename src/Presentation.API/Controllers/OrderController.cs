@@ -10,10 +10,12 @@ namespace Presentation.API.Controllers
     public class OrderController : ControllerBase
     {
         private readonly OrderService orderService;
+        private readonly ILogger<OrderController> logger;
 
-        public OrderController(OrderService _orderService)
+        public OrderController(OrderService _orderService, ILogger<OrderController> _logger)
         {
             orderService = _orderService;
+            logger = _logger;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
@@ -26,7 +28,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
 
             }
@@ -47,7 +49,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
 
             }
@@ -67,7 +69,7 @@ namespace Presentation.API.Controllers
                 return Ok(order);
             }
             catch (Exception ex) {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -83,11 +85,12 @@ namespace Presentation.API.Controllers
             }
             catch(InvalidOperationException e)
             {
+                logger.LogError(e.Message);
                 return BadRequest(e.Message);
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
             

@@ -9,8 +9,10 @@ namespace Presentation.API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ProductService productService;
-        public ProductController(ProductService _productService) { 
+        private readonly ILogger<ProductController> logger;
+        public ProductController(ProductService _productService, ILogger<ProductController> _logger) { 
             productService = _productService;
+            logger = _logger;
         }
 
         [HttpGet]
@@ -22,7 +24,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             } 
         }
@@ -41,7 +43,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {   
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -57,11 +59,12 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(ex.Message);
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error" + ex.Message);
             }
         }
@@ -80,11 +83,12 @@ namespace Presentation.API.Controllers
             }
             catch (KeyNotFoundException ex)
             {
+                logger.LogError(ex.Message);
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
 
@@ -104,7 +108,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
 
