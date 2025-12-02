@@ -23,6 +23,10 @@ namespace Data.Repositories
             return await context.ShoppingCarts
                 .Include(sc => sc.CartItems)
                     .ThenInclude(ci => ci.Product)
+                        .ThenInclude(ci => ci.Category)
+                .Include(sc => sc.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Images)
                 .ToListAsync();
         }
         public override async Task<ShoppingCart?> GetByIdAsync(string id)
@@ -30,6 +34,10 @@ namespace Data.Repositories
             return await context.ShoppingCarts
                 .Include(sc => sc.CartItems)
                     .ThenInclude(ci => ci.Product)
+                        .ThenInclude(ci => ci.Category)
+                .Include(sc => sc.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Images)
                 .FirstOrDefaultAsync(sc => sc.Id == id);
         }
 
@@ -38,6 +46,10 @@ namespace Data.Repositories
             return await context.ShoppingCarts
                 .Include(sc => sc.CartItems)
                     .ThenInclude(ci => ci.Product)
+                        .ThenInclude(ci => ci.Category)
+                .Include(sc => sc.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Images)
                 .FirstOrDefaultAsync(sc => sc.UserId == userId);
         }
 

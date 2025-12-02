@@ -1,6 +1,4 @@
-﻿
-
-using Core.Entities;
+﻿using Core.DTOs.Products;
 
 namespace Core.DTOs.CartItem
 {
@@ -8,7 +6,7 @@ namespace Core.DTOs.CartItem
     {
         public string Id { get; set; }
         public string CartId { get; set; }
-        public Product product { get; set; }
+        public ProductDto product { get; set; }
         public int Quantity { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

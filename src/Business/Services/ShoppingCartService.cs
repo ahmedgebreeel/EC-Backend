@@ -1,4 +1,5 @@
 ﻿using Core.DTOs.CartItem;
+using Core.DTOs.Products;
 using Core.DTOs.ShoppingCart;
 using Core.Entities;
 using Data.Repositories;
@@ -28,7 +29,18 @@ namespace Business.Services
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    product = ci.Product,
+                    product = new ProductDto
+                    {
+                        Id = ci.Product.Id,
+                        Name = ci.Product.Name,
+                        Description = ci.Product.Description,
+                        CategoryName = ci.Product.Category.Name,
+                        Price = ci.Product.Price,
+                        Stock = ci.Product.Stock,
+                        Image = ci.Product.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                        CreatedAt = ci.Product.CreatedAt,
+                        UpdatedAt = ci.Product.UpdatedAt
+                    },
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt
@@ -56,7 +68,18 @@ namespace Business.Services
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    product = ci.Product,
+                    product = new ProductDto
+                    {
+                        Id = ci.Product.Id,
+                        Name = ci.Product.Name,
+                        Description = ci.Product.Description,
+                        CategoryName = ci.Product.Category.Name,
+                        Price = ci.Product.Price,
+                        Stock = ci.Product.Stock,
+                        Image = ci.Product.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                        CreatedAt = ci.Product.CreatedAt,
+                        UpdatedAt = ci.Product.UpdatedAt
+                    },
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt
@@ -84,7 +107,18 @@ namespace Business.Services
                 {
                     Id = ci.Id,
                     CartId = ci.CartId,
-                    product = ci.Product,
+                    product = new ProductDto
+                    {
+                        Id = ci.Product.Id,
+                        Name = ci.Product.Name,
+                        Description = ci.Product.Description,
+                        CategoryName = ci.Product.Category.Name,
+                        Price = ci.Product.Price,
+                        Stock = ci.Product.Stock,
+                        Image = ci.Product.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                        CreatedAt = ci.Product.CreatedAt,
+                        UpdatedAt = ci.Product.UpdatedAt
+                    },
                     Quantity = ci.Quantity,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt

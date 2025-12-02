@@ -1,4 +1,5 @@
 ﻿using Core.DTOs.CartItem;
+using Core.DTOs.Products;
 using Core.Entities;
 using Data.Repositories;
 
@@ -21,7 +22,18 @@ namespace Business.Services
             {
                 Id = item.Id,
                 CartId = item.CartId,
-                product = item.Product,
+                product = new ProductDto
+                {
+                    Id = item.Product.Id,
+                    Name = item.Product.Name,
+                    Description = item.Product.Description,
+                    CategoryName = item.Product.Category.Name,
+                    Price = item.Product.Price,
+                    Stock = item.Product.Stock,
+                    Image = item.Product.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                    CreatedAt = item.Product.CreatedAt,
+                    UpdatedAt = item.Product.UpdatedAt
+                },
                 Quantity = item.Quantity,
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
@@ -42,7 +54,18 @@ namespace Business.Services
             {
                 Id = cartItem.Id,
                 CartId = cartItem.CartId,
-                product = cartItem.Product,
+                product = new ProductDto
+                {
+                    Id = cartItem.Product.Id,
+                    Name = cartItem.Product.Name,
+                    Description = cartItem.Product.Description,
+                    CategoryName = cartItem.Product.Category.Name,
+                    Price = cartItem.Product.Price,
+                    Stock = cartItem.Product.Stock,
+                    Image = cartItem.Product.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                    CreatedAt = cartItem.Product.CreatedAt,
+                    UpdatedAt = cartItem.Product.UpdatedAt
+                },
                 Quantity = cartItem.Quantity,
                 CreatedAt = cartItem.CreatedAt,
                 UpdatedAt = cartItem.UpdatedAt
