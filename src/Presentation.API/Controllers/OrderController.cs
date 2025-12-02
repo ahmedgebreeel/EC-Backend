@@ -10,10 +10,12 @@ namespace Presentation.API.Controllers
     public class OrderController : ControllerBase
     {
         private readonly OrderService orderService;
+        private readonly ILogger<OrderController> logger;
 
-        public OrderController(OrderService _orderService)
+        public OrderController(OrderService _orderService, ILogger<OrderController> _logger)
         {
             orderService = _orderService;
+            logger = _logger;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
@@ -26,7 +28,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
 
             }
@@ -47,7 +49,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
 
             }
@@ -59,15 +61,16 @@ namespace Presentation.API.Controllers
             try
             {
                 var order = await orderService.GetByUserIdAsync(userId);
-                if(order == null)
+                if (order == null)
                 {
                     return NotFound("Order not found");
 
                 }
                 return Ok(order);
             }
-            catch (Exception ex) {
-                Console.WriteLine(ex);
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -75,22 +78,71 @@ namespace Presentation.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAsync(AddOrderDto order)
         {
-            try {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
 
                 await orderService.AddAsync(order);
                 return Ok("Order created successfully ");
 
             }
-            catch(InvalidOperationException e)
+            catch (InvalidOperationException e)
             {
                 return BadRequest(e.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
-            
+
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(string id, UpdateOrderDto UpdatedOrderDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                await orderService.UpdateAsync(id, UpdatedOrderDto);
+
+                return NoContent();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(string id)
+        {
+            try
+            {
+                await orderService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }
