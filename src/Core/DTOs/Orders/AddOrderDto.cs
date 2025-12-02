@@ -1,5 +1,4 @@
-﻿using Core.DTOs.OrderItems;
-using Core.Enums;
+﻿using Core.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
