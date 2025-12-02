@@ -22,6 +22,7 @@ namespace Business.Services
             if (existingProduct == null) {
                 throw new InvalidOperationException("Product does not exist.");
             }
+
             var existingOrderItem = await unitOfWork.Repository<OrderItem>()
                 .FindAsync(o=>o.OrderId==addOrderItemDto.OrderId && o.ProductId==addOrderItemDto.ProductId);
            
@@ -39,7 +40,7 @@ namespace Business.Services
             {
                 OrderId = addOrderItemDto.OrderId,
                 ProductId = addOrderItemDto.ProductId,
-                Price = existingProduct.Price,
+                Price = existingProduct.Price * addOrderItemDto.Quantity,
                 Quantity = addOrderItemDto.Quantity,
 
             };
@@ -53,8 +54,10 @@ namespace Business.Services
             if (existingOrderItem == null) {
                 throw new InvalidOperationException("Order item does not exist.");
             }
+            var existingProduct = await unitOfWork.Products.GetByIdAsync(existingOrderItem.ProductId);
+            
             existingOrderItem.Quantity = updateOrderItemDto.Quantity;
-            existingOrderItem.Price = updateOrderItemDto.Price;
+            existingOrderItem.Price = existingProduct.Price * updateOrderItemDto.Quantity;
             existingOrderItem.UpdatedAt = DateTime.UtcNow;
 
             unitOfWork.Repository<OrderItem>().Update(existingOrderItem);
