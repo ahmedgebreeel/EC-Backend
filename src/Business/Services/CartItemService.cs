@@ -73,8 +73,6 @@ namespace Business.Services
                 CartId = addCartItemDto.CartId,
                 ProductId = addCartItemDto.ProductId,
                 Quantity = addCartItemDto.Quantity,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             });
             await _unitOfWork.SaveChangesAsync();
         }

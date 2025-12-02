@@ -9,10 +9,12 @@ namespace Presentation.API.Controllers;
 public class CartItemController : ControllerBase
 {
     private readonly CartItemService cartItemService;
+    private readonly ILogger<CartItemController> logger;
 
-    public CartItemController(CartItemService _cartItemService)
+    public CartItemController(CartItemService _cartItemService, ILogger<CartItemController> _logger)
     {
         cartItemService = _cartItemService;
+        logger = _logger;
     }
 
     // these 2 methods are not needed
@@ -65,11 +67,12 @@ public class CartItemController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
+            logger.LogError(ex.Message);
             return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -88,11 +91,12 @@ public class CartItemController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex.Message);
             return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -107,11 +111,12 @@ public class CartItemController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
+            logger.LogError(ex.Message);
             return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            logger.LogError(ex.Message);
             return StatusCode(500, "Internal server error");
         }
     }

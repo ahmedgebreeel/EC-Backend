@@ -17,15 +17,13 @@ namespace Core.DTOs.Products
 
     }
 
-    public class CreateProductsImagesDto
+    public class AddProductsImagesDto
     {
         [Required]
         [MaxLength(1000)]
         public string ImageUrl { get; set; }
         [Required]
         public int Position { get; set; }
-        [Required]
-        public string ProductId { get; set; }
 
     }
 

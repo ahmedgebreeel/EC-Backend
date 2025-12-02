@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.DTOs.Products
 {
-    public class CreateProductDto
+    public class AddProductDto
     {
         [Required]
         [MaxLength(300)]
@@ -21,7 +20,7 @@ namespace Core.DTOs.Products
         [Required]
         public string SellerId { get; set; }
 
-        public ICollection<CreateProductsImagesDto> Images { get; set; }
+        public ICollection<IFormFile> Images { get; set; }
 
     }
     public class UpdateProductDto
@@ -40,6 +39,6 @@ namespace Core.DTOs.Products
         [Required]
         public string SellerId { get; set; }
 
-        public ICollection<CreateProductsImagesDto> Images { get; set; }
+        public ICollection<IFormFile> Images { get; set; }
     }
 }

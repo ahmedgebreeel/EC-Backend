@@ -68,8 +68,8 @@ namespace Presentation.API.Controllers
                 }
                 return Ok(order);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
+            
                 logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
@@ -92,6 +92,7 @@ namespace Presentation.API.Controllers
             }
             catch (InvalidOperationException e)
             {
+                logger.LogError(e.Message);
                 return BadRequest(e.Message);
             }
             catch (Exception ex)

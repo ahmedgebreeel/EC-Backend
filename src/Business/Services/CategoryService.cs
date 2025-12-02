@@ -85,6 +85,8 @@ namespace Business.Services
             if (updateCategoryDto.ParentCategoryId != null)
                 category.ParentCategoryId = updateCategoryDto.ParentCategoryId;
 
+            category.UpdatedAt = DateTime.UtcNow;
+
             unitOfWork.Repository<Category>().Update(category);
             await unitOfWork.SaveChangesAsync();
         }

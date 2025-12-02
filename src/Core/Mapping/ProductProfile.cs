@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace Core.Mapping
 {
-    public class ProductProfile:Profile
+    public class ProductProfile : Profile
     {
 
-        public ProductProfile() {
+        public ProductProfile()
+        {
 
             // => Mapping Product → ProductDto
 
@@ -22,11 +23,11 @@ namespace Core.Mapping
                 opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.Image,
                 opt =>
-                opt.MapFrom(src =>  src.Images.Select(i => i.ImageUrl).FirstOrDefault()))
+                opt.MapFrom(src => src.Images.Select(i => i.ImageUrl).FirstOrDefault()))
                 .ReverseMap();
 
             // => Mapping Product → ProductDetailsDto
-            CreateMap<Product,ProductDetailsDto>()
+            CreateMap<Product, ProductDetailsDto>()
                  .ForMember(dest => dest.CategoryName,
                 opt =>
                 opt.MapFrom(src => src.Category.Name))
@@ -39,28 +40,13 @@ namespace Core.Mapping
                 .ReverseMap();
 
             // => Mapping CreateProductDto → Product
-            CreateMap<CreateProductDto, Product>()
-                .ForMember(dest => dest.Images,
-                           opt => 
-                           opt.MapFrom(src =>
-                               src.Images.Select(img => new ProductImage
-                               {
-                                   ImageUrl = img.ImageUrl,
-                                   Position = img.Position
-                               })
-                           ));
+            CreateMap<AddProductDto, Product>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
 
             CreateMap<UpdateProductDto, Product>()
-                .ForMember(dest => dest.Images,
-                           opt =>
-                           opt.MapFrom(src =>
-                               src.Images.Select(img => new ProductImage
-                               {
-                                   ImageUrl = img.ImageUrl,
-                                   Position = img.Position
-                               })
-                           ));
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
 
             // => Mapping ProductImage → ProductsImagesDto
             CreateMap<ProductImage, ProductsImagesDto>()
