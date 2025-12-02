@@ -61,7 +61,7 @@ namespace Presentation.API.Controllers
             try
             {
                 var order = await orderService.GetByUserIdAsync(userId);
-                if(order == null)
+                if (order == null)
                 {
                     return NotFound("Order not found");
 
@@ -69,6 +69,7 @@ namespace Presentation.API.Controllers
                 return Ok(order);
             }
             catch (Exception ex) {
+            
                 logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
@@ -77,23 +78,72 @@ namespace Presentation.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAsync(AddOrderDto order)
         {
-            try {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
 
                 await orderService.AddAsync(order);
                 return Ok("Order created successfully ");
 
             }
-            catch(InvalidOperationException e)
+            catch (InvalidOperationException e)
             {
                 logger.LogError(e.Message);
                 return BadRequest(e.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
-            
+
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(string id, UpdateOrderDto UpdatedOrderDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                await orderService.UpdateAsync(id, UpdatedOrderDto);
+
+                return NoContent();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(string id)
+        {
+            try
+            {
+                await orderService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }

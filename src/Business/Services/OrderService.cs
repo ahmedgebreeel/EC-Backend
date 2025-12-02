@@ -1,6 +1,7 @@
 ﻿using Core.DTOs.OrderItems;
 using Core.DTOs.Orders;
 using Core.Entities;
+using Core.Enums;
 using Data.Repositories;
 
 namespace Business.Services
@@ -145,8 +146,39 @@ namespace Business.Services
             await unitOfWork.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync (string id, UpdateOrderDto updatedOrderDto)
+        {
+            var existingOrder = await unitOfWork.Orders.GetByIdAsync(id);
+            if (existingOrder == null)
+            {
+                throw new InvalidOperationException("Order does not exist.");
+            }
+            
+            var existingAddress = await unitOfWork.Repository<Address>().GetByIdAsync(updatedOrderDto.AddressId);
+            //should add the address if not exist
+            if (existingAddress == null)
+            {
+                throw new InvalidOperationException("Address does not exist.");
+            }
 
+            existingOrder.Status = updatedOrderDto.Status.ToString();
+            existingOrder.AddressId = updatedOrderDto.AddressId;
 
+            unitOfWork .Orders.Update(existingOrder);
+            await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync (string id)
+        {
+            var existingOrder = await unitOfWork.Orders.GetByIdAsync(id);
+            if (existingOrder == null)
+            {
+                throw new InvalidOperationException("Order does not exist.");
+            }
+            existingOrder.Status = OrderStatus.Cancelled.ToString();
+            unitOfWork.Orders.Update(existingOrder);
+            await unitOfWork.SaveChangesAsync();
+        }
 
     }
 }

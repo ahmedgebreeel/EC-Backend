@@ -1,4 +1,5 @@
 ﻿using Core.DTOs.OrderItems;
+using Core.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +12,7 @@ namespace Core.DTOs.Orders
         [Required]
         public string AddressId { get; set; }
         [Required]
-        public string Status { get; set; }
+        public OrderStatus Status { get; set; }
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Total { get; set; }
