@@ -47,7 +47,7 @@ namespace Presentation.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(CreateProductDto productDto)
+        public async Task<IActionResult> AddAsync([FromForm] AddProductDto productDto)
         {
             if(!ModelState.IsValid) return BadRequest();
             try
@@ -62,12 +62,12 @@ namespace Presentation.API.Controllers
             catch(Exception ex)
             {
                 Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "Internal server error" + ex.Message);
             }
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync(string id,UpdateProductDto productDto)
+        public async Task<IActionResult> UpdateAsync(string id, [FromForm] UpdateProductDto productDto)
         {
             if (!ModelState.IsValid)
             {
@@ -84,6 +84,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500, "Internal server error");
             }
 
@@ -103,6 +104,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500, "Internal server error");
             }
 
