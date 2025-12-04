@@ -18,9 +18,9 @@ namespace Core.Mapping
             // => Mapping Product → ProductDto
 
             CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.CategoryName,
+                .ForMember(dest => dest.CategoryId,
                 opt =>
-                opt.MapFrom(src => src.Category.Name))
+                opt.MapFrom(src => src.CategoryId))
                 .ForMember(dest => dest.Image,
                 opt =>
                 opt.MapFrom(src => src.Images.Select(i => i.ImageUrl).FirstOrDefault()))

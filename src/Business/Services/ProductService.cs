@@ -4,6 +4,7 @@ using Core.Entities;
 using Core.Enums;
 using Data.Repositories;
 using Microsoft.AspNetCore.Hosting;
+using System.Linq.Expressions;
 
 
 namespace Business.Services
@@ -21,11 +22,49 @@ namespace Business.Services
             env = _env;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(int? pageNum, int? pageSize)
+        public async Task<IEnumerable<ProductDto>> GetAllAsync(
+            int? pageNum, int? pageSize,
+            string? search,
+            string? category,
+            decimal? minPrice,
+            decimal? maxPrice)
         {
+            bool hasSearch = 
+                !string.IsNullOrEmpty(search)||
+                !string.IsNullOrEmpty(category)||
+                minPrice.HasValue||
+                maxPrice.HasValue;
+            if (hasSearch)
+            {
+                var existCategory = (await unitOfWork.Repository<Category>()
+                    .FindAsync(c=>c.Name==category)).FirstOrDefault();
+
+                Expression<Func<Product, bool>> predicate = p=>
+                (string.IsNullOrEmpty(search) || p.Name.Contains(search)) &&
+                (string.IsNullOrEmpty(category) || p.CategoryId == existCategory.Id) &&
+                (!minPrice.HasValue || p.Price >= minPrice) &&
+                (!maxPrice.HasValue || p.Price <= maxPrice);
+
+                var res = await unitOfWork.Products.FindAsync(predicate);
+                return res.Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    CategoryId = p.CategoryId,
+                    Price = p.Price,
+                    Stock = p.Stock,
+                    Image = p.Images.FirstOrDefault()?.ImageUrl ?? string.Empty,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt
+
+                }
+                    ).ToList();
+            }
             var products = await unitOfWork
                 .Products
                 .GetAllAsync(pageNum, pageSize);
+
 
             return _mapper.Map<List<ProductDto>>(products);
 

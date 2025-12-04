@@ -16,10 +16,19 @@ namespace Presentation.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery]int? pageNum , [FromQuery] int? pageSize) {
+        public async Task<IActionResult> GetAllAsync(
+            [FromQuery]int? pageNum , [FromQuery] int? pageSize,
+            [FromQuery]string? search,
+            [FromQuery] string? category,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice) {
             try
             {
-                var produts = await productService.GetAllAsync(pageNum,pageSize);
+                var produts = await productService.GetAllAsync(
+                    pageNum,pageSize,
+                    search,
+                    category,
+                    minPrice,maxPrice);
                 return Ok(produts);
             }
             catch (Exception ex)
@@ -81,7 +90,7 @@ namespace Presentation.API.Controllers
                 await productService.UpdateAsync(id, productDto);
                 return NoContent();
             }
-            catch (KeyNotFoundException ex)
+            catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException)
             {
                 logger.LogError(ex.Message);
                 return NotFound(ex.Message);

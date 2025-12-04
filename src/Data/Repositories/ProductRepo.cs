@@ -16,7 +16,7 @@ namespace Data.Repositories
             if(pageNum is not null && pageSize is not null)
             {
                 return await context.Products
-                .Include(p => p.Category)
+                //.Include(p => p.Category)
                 .Include(p => p.Images)
                 .Select(p => new Product
                 {
