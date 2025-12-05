@@ -56,6 +56,9 @@ public class AppDbContext : DbContext
                 .HasForeignKey(p => p.SellerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //Auto include navigation properties
+            entity.Navigation(p => p.Images).AutoInclude();
+
             // Indexes for better performance
             entity.HasIndex(p => p.Name);
             entity.HasIndex(p => p.CategoryId);
