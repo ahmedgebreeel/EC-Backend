@@ -1,10 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
@@ -17,8 +12,15 @@ namespace Data.Repositories
             context = _context;
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync(int? pageNum =null , int? pageSize=null)
         {
+            if(pageNum is not null && pageSize is not null )
+            {
+                return await context.Set<T>()
+                    .Skip((pageNum - 1) * pageSize??0)
+                    .Take(pageSize??10)
+                    .ToListAsync();
+            }
             return await context.Set<T>().ToListAsync();
         }
         

@@ -10,6 +10,9 @@ namespace Data.Repositories
 
         private ProductRepo products ;
         private UserRepository users;
+        private OrderRepo orders;
+
+        private ShoppingCartRepo cart;
 
         public UnitOfWork(AppDbContext _context)
         {
@@ -46,6 +49,30 @@ namespace Data.Repositories
                     users = new UserRepository(context);
                 }
                 return users;
+            }
+        }
+
+        public OrderRepo Orders
+        {
+            get
+            {
+                if(orders == null)
+                {
+                    orders = new OrderRepo(context);
+                }
+                return orders;
+            }
+        }
+
+        public ShoppingCartRepo Cart
+        {
+            get
+            {
+                if (cart == null)
+                {
+                    cart = new ShoppingCartRepo(context);
+                }
+                return cart;
             }
         }
  

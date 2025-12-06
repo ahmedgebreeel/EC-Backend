@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Core.Entities;
 public class ProductImage
@@ -14,6 +15,7 @@ public class ProductImage
     public string ProductId { get; set; }
 
     [ForeignKey("ProductId")]
+    [JsonIgnoreAttribute]
     public virtual Product Product { get; set; }
 
     [Required]

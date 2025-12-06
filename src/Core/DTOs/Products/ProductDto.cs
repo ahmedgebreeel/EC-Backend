@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.DTOs.Products
+﻿namespace Core.DTOs.Products
 {
     public class ProductDto
     {
@@ -14,7 +8,9 @@ namespace Core.DTOs.Products
         public string CategoryName { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string Images {  get; set; }
+        public string Image {  get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
     }
 
@@ -28,6 +24,8 @@ namespace Core.DTOs.Products
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public ICollection<ProductsImagesDto> Images { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
     }
 

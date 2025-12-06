@@ -9,20 +9,22 @@ namespace Presentation.API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ProductService productService;
-        public ProductController(ProductService _productService) { 
+        private readonly ILogger<ProductController> logger;
+        public ProductController(ProductService _productService, ILogger<ProductController> _logger) { 
             productService = _productService;
+            logger = _logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync() {
+        public async Task<IActionResult> GetAllAsync([FromQuery]int? pageNum , [FromQuery] int? pageSize) {
             try
             {
-                var produts = await productService.GetAllAsync();
+                var produts = await productService.GetAllAsync(pageNum,pageSize);
                 return Ok(produts);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             } 
         }
@@ -41,13 +43,13 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {   
-                Console.WriteLine(ex);
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(CreateProductDto productDto)
+        public async Task<IActionResult> AddAsync([FromForm] AddProductDto productDto)
         {
             if(!ModelState.IsValid) return BadRequest();
             try
@@ -57,17 +59,18 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(ex.Message);
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
-                return StatusCode(500, "Internal server error");
+                logger.LogError(ex.Message);
+                return StatusCode(500, "Internal server error" + ex.Message);
             }
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync(string id,UpdateProductDto productDto)
+        public async Task<IActionResult> UpdateAsync(string id, [FromForm] UpdateProductDto productDto)
         {
             if (!ModelState.IsValid)
             {
@@ -80,10 +83,12 @@ namespace Presentation.API.Controllers
             }
             catch (KeyNotFoundException ex)
             {
+                logger.LogError(ex.Message);
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
 
@@ -103,6 +108,7 @@ namespace Presentation.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return StatusCode(500, "Internal server error");
             }
 
