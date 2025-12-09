@@ -22,13 +22,14 @@ namespace Business.Services
             env = _env;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(
+        public async Task<ProductListResponseDto> GetAllAsync(
             int? pageNum, int? pageSize,
             string? search,
             string? category,
             decimal? minPrice,
             decimal? maxPrice)
         {
+            var totalCount = await unitOfWork.Products.CountAsync();
             bool hasSearch = 
                 !string.IsNullOrEmpty(search)||
                 !string.IsNullOrEmpty(category)||
@@ -46,7 +47,7 @@ namespace Business.Services
                 (!maxPrice.HasValue || p.Price <= maxPrice);
 
                 var res = await unitOfWork.Products.FindAsync(predicate);
-                return res.Select(p => new ProductDto
+                var productListFilter =  res.Select(p => new ProductDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -60,13 +61,24 @@ namespace Business.Services
 
                 }
                     ).ToList();
+                return new ProductListResponseDto
+                {
+                    Products = productListFilter,
+                    TotalCount = totalCount
+                };
             }
             var products = await unitOfWork
                 .Products
                 .GetAllAsync(pageNum, pageSize);
 
 
-            return _mapper.Map<List<ProductDto>>(products);
+            var productList =  _mapper.Map<List<ProductDto>>(products);
+
+            return new ProductListResponseDto
+            {
+                Products = productList,
+                TotalCount = totalCount
+            };
 
         }
 
