@@ -78,5 +78,10 @@ namespace Data.Repositories
                 .FirstOrDefaultAsync(p=>p.Id == id);
                
         }
+
+        public async Task<int> CountAsync()
+        {
+            return await context.Products.CountAsync();
+        }
     }
 }
