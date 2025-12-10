@@ -1,40 +1,20 @@
-using System.Text.Json.Serialization;
 using Business.Services;
 using Core.Mapping;
 using Data;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 
 //add DB context
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-
-
-//add UnitOfWork
-builder.Services.AddScoped<UnitOfWork>();
-
-//Add Services
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<CartItemService>();
-builder.Services.AddScoped<ShoppingCartService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<OrderService>();
-
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(cfg =>
@@ -44,17 +24,35 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 
+//Add Services
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<CartItemService>();
+builder.Services.AddScoped<ShoppingCartService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<OrderService>();
+
+//add UnitOfWork
+builder.Services.AddScoped<UnitOfWork>();
+
+//Controllers Configuration
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+
+//OpenApi
+builder.Services.AddOpenApi();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-     app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "";
-    });
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/openapi/v1.json", "My Api v1"));
 }
 
 app.UseHttpsRedirection();
