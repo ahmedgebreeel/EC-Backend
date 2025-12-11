@@ -1,24 +1,23 @@
 using Core.DTOs.Auth;
 using Core.Entities;
+using Core.Enums;
+using Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace Business.Services;
 
-public interface IAuthService
-{
-    Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request);
-    Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
-}
-
-public class AuthService : IAuthService
+public class AuthService
 {
     private readonly UserManager<User> userManager;
-    private readonly ITokenService tokenService;
+    private readonly TokenService tokenService;
 
-    public AuthService(UserManager<User> userManager, ITokenService tokenService)
+    private readonly UnitOfWork unitOfWork;
+
+    public AuthService(UserManager<User> userManager, TokenService tokenService, UnitOfWork _unitOfWork)
     {
         this.userManager = userManager;
         this.tokenService = tokenService;
+        unitOfWork = _unitOfWork;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -35,17 +34,20 @@ public class AuthService : IAuthService
                     Message = "User with this email already exists"
                 };
             }
-
+        
             // Create new user
             var user = new User
             {
-                UserName = request.Email,
                 Email = request.Email,
+                UserName = request.Email,
                 FullName = request.FullName,
-                EmailConfirmed = true
+                PhoneNumber = request.PhoneNumber,
+
+               // Gives default role
+                RoleId = (await unitOfWork.Repository<Role>().FindAsync(r => r.Name == RoleType.Customer.ToString())).FirstOrDefault()!.Id
             };
 
-            var result = await userManager.CreateAsync(user, request.Password);
+            IdentityResult result = await userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
             {
@@ -58,11 +60,10 @@ public class AuthService : IAuthService
             }
 
             // Assign default role (optional - uncomment if using roles)
-            // await userManager.AddToRoleAsync(user, "Customer");
+            // await userManager.AddToRoleAsync(user, RoleType.Customer.ToString());
 
             // Get user roles and generate token
-            var roles = await userManager.GetRolesAsync(user);
-            var token = tokenService.GenerateToken(user, roles);
+            var token = tokenService.GenerateToken(user, new List <string> { user.Role.Name! });
 
             return new AuthResponseDto
             {
@@ -74,7 +75,8 @@ public class AuthService : IAuthService
                     Id = user.Id,
                     Email = user.Email,
                     FullName = user.FullName,
-                    PhoneNumber = user.PhoneNumber
+                    PhoneNumber = user.PhoneNumber,
+                    Role = user.Role.Name
                 }
             };
         }
@@ -115,8 +117,9 @@ public class AuthService : IAuthService
             }
 
             // Get user roles and generate token
-            var roles = await userManager.GetRolesAsync(user);
-            var token = tokenService.GenerateToken(user, roles);
+            // var roles = await userManager.GetRolesAsync(user);
+            var role = await unitOfWork.Repository<Role>().GetByIdAsync(user.RoleId);
+            var token = tokenService.GenerateToken(user, new List <string> { role?.Name! });
 
             return new AuthResponseDto
             {
@@ -126,9 +129,10 @@ public class AuthService : IAuthService
                 User = new UserAuthDto
                 {
                     Id = user.Id,
-                    Email = user.Email,
+                    Email = user.Email!,
                     FullName = user.FullName,
-                    PhoneNumber = user.PhoneNumber
+                    PhoneNumber = user.PhoneNumber,
+                    Role = user.Role.Name
                 }
             };
         }

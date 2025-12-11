@@ -8,15 +8,15 @@ namespace Presentation.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService authService;
+    private readonly AuthService authService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(AuthService _authService)
     {
-        this.authService = authService;
+        authService = _authService;
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
+    public async Task<ActionResult<AuthResponseDto>> Register(RegisterRequestDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto request)
+    public async Task<ActionResult<AuthResponseDto>> Login(LoginRequestDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

@@ -22,7 +22,7 @@ namespace Business.Services
             {
                 Id = o.Id,
                 UserId = o.UserId,
-                UserName = o.User.Name,
+                UserName = o.User.FullName,
                 Status = o.Status,
                 Total = o.Total,
                 Address = o.Address,
@@ -53,7 +53,7 @@ namespace Business.Services
             {
                 Id = order.Id,
                 UserId = order.UserId,
-                UserName = order.User.Name,
+                UserName = order.User.FullName,
                 Status = order.Status,
                 Total = order.Total,
                 Address = order.Address,
@@ -85,7 +85,7 @@ namespace Business.Services
             {
                 Id = order.Id,
                 UserId = order.UserId,
-                UserName = order.User.Name,
+                UserName = order.User.FullName,
                 Status = order.Status,
                 Total = order.Total,
                 Address = order.Address,

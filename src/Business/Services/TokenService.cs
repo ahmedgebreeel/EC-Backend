@@ -7,12 +7,7 @@ using System.Text;
 
 namespace Business.Services;
 
-public interface ITokenService
-{
-    string GenerateToken(User user, IList<string>? roles = null);
-}
-
-public class TokenService : ITokenService
+public class TokenService
 {
     private readonly IConfiguration configuration;
 
@@ -23,8 +18,8 @@ public class TokenService : ITokenService
 
     public string GenerateToken(User user, IList<string>? roles = null)
     {
-        var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"];
+        var jwtSettings = configuration.GetSection("Jwt");
+        var secretKey = jwtSettings["Key"];
         var issuer = jwtSettings["Issuer"];
         var audience = jwtSettings["Audience"];
         var expirationMinutes = int.Parse(jwtSettings["ExpirationMinutes"] ?? "60");

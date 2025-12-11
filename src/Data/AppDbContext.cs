@@ -1,10 +1,11 @@
 using Core.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data;
 
-public class AppDbContext : IdentityDbContext<User>
+public class AppDbContext : IdentityDbContext<User, Role, string>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -21,6 +22,13 @@ public class AppDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Ignore Identity tables we don't need
+        modelBuilder.Ignore<IdentityUserClaim<string>>();
+        modelBuilder.Ignore<IdentityUserLogin<string>>();
+        modelBuilder.Ignore<IdentityUserToken<string>>();
+        modelBuilder.Ignore<IdentityRoleClaim<string>>();
+        modelBuilder.Ignore<IdentityUserRole<string>>();
 
         // ============================================
         // CATEGORY CONFIGURATION
@@ -81,10 +89,18 @@ public class AppDbContext : IdentityDbContext<User>
         // ============================================
         modelBuilder.Entity<User>(entity =>
         {
-            // Unique email constraint is already handled by Identity
-            
+            // Unique email constraint
+            entity.HasIndex(u => u.Email)
+                .IsUnique();
+
+            // User-Role relationship
+            entity.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Indexes
-            entity.HasIndex(u => u.Email);
+            entity.HasIndex(u => u.RoleId);
         });
 
         // ============================================
@@ -181,6 +197,16 @@ public class AppDbContext : IdentityDbContext<User>
 
             // Index
             entity.HasIndex(oi => new { oi.OrderId, oi.ProductId });
+        });
+
+        // ============================================
+        // ROLE CONFIGURATION
+        // ============================================
+        modelBuilder.Entity<Role>(entity =>
+        {
+            // Unique role name
+            entity.HasIndex(r => r.Name)
+                .IsUnique();
         });
     }
 }
