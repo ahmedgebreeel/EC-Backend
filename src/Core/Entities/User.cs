@@ -1,28 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core.Entities;
-public class User
+public class User: IdentityUser
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public override string Id { get; set; } = Guid.NewGuid().ToString();
 
     [Required]
     [MaxLength(200)]
-    public string Name { get; set; }
-
-    [Required]
-    [MaxLength(255)]
-    [EmailAddress]
-    public string Email { get; set; }
-
-    [Required]
-    [MaxLength(500)]
-    public string PasswordHash { get; set; }
-
-    [MaxLength(20)]
-    public string Phone { get; set; }
+    public string FullName { get; set; }
 
     // Foreign key for Role
     [Required]

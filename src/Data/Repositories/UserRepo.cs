@@ -12,12 +12,11 @@ namespace Data.Repositories
         public override Task<User?> GetByIdAsync(string id)
         {
             return context.Users
-                .Include(u => u.Role)
-                .Include(u=>u.Addresses)
-                .Include(u=>u.Orders)
-                .Include(u=>u.ShoppingCart!)
-                    .ThenInclude(sc=>sc.CartItems)
-                        .ThenInclude(ci=>ci.Product)
+                .Include(u => u.Addresses)
+                .Include(u => u.Orders)
+                .Include(u => u.ShoppingCart!)
+                    .ThenInclude(sc => sc.CartItems)
+                        .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
     }
