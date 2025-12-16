@@ -70,7 +70,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<UnitOfWork>();
 
 //Add Services
-builder.Services.AddScoped<AuthService>(); 
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CartItemService>();
@@ -87,23 +87,36 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularApp", policy =>
+    {
+        policy.AllowAnyOrigin() // Angular Port
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials(); // Required for HttpOnly Cookies
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-     app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "";
-    });
+    app.UseSwaggerUI(c =>
+   {
+       c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+       c.RoutePrefix = "";
+   });
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AngularApp");
 
 app.UseStaticFiles();
 app.MapControllers();
