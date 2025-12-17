@@ -93,8 +93,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin() // Angular Port
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials(); // Required for HttpOnly Cookies
+                .AllowAnyMethod();
+                // .AllowCredentials(); // Required for HttpOnly Cookies
     });
 });
 
