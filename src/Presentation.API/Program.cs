@@ -91,10 +91,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularApp", policy =>
     {
-        policy.AllowAnyOrigin() // Angular Port
+        policy.WithOrigins(
+                "https://gebreel2.runasp.net",
+                "https://ec-frontend-amber.vercel.app",
+                "http://localhost:4200"
+                ) 
                 .AllowAnyHeader()
-                .AllowAnyMethod();
-                // .AllowCredentials(); // Required for HttpOnly Cookies
+                .AllowAnyMethod()
+                .AllowCredentials(); // Required for HttpOnly Cookies
     });
 });
 
